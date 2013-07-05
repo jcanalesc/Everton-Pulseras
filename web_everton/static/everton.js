@@ -3,6 +3,24 @@ var t_sectores = null,
     t_fotos = null,
     t_registros = null;
 
+function getcodigo(tipo)
+{
+  var arreglo = null;
+  switch(tipo)
+  {
+    case "segmento": arreglo = t_segmentos; break;
+    case "sector": arreglo = t_sectores; break;
+    default: return null;
+  }
+  var i = 1;
+  var dato = "";
+  for (i = 1, dato = i<=9 ? "0"+i.toString() : i.toString(); i <= arreglo.filas.length; i++,dato = i<=9 ? "0"+i.toString() : i.toString())
+  {
+    if (arreglo.mapear(dato) == null) return dato;
+  }
+  return dato;
+}
+
 function actualiza_storage(obj)
 {
   switch(obj.nombre)
@@ -113,7 +131,7 @@ function cargar(evento)
 }
 $(function()
 {
-  t_sectores = new Tabla("#sectores",["Codigo", "Etiqueta"], "sector", true);
+  t_sectores = new Tabla("#sectores",["Codigo", "Etiqueta", "Color"], "sector", true);
   t_segmentos = new Tabla("#segmentos", ["Codigo", "Etiqueta"], "segmento", true);
   t_fotos = new Tabla("#fotos", ["Foto", "Etiqueta"], "foto", true);
   t_registros = new Tabla("#registros", ["Sector", "Segmento", "Entradas", "Foto"], "registro");
@@ -121,21 +139,43 @@ $(function()
 
   t_sectores.obtenerDatos = function()
   {
-    var codigo = prompt("Codigo del sector:");
+    var codigo = getcodigo("sector");
     var sector = prompt("Nombre del sector:");
+    var color = prompt("Color del sector: Escriba un trío RGB ('0,255,123' o '#FF3BCD'):");
     if (!codigo || codigo == null) return null;
     if (!sector || sector == null) return null;
+    if (!color || color == null) return null;
+    var reg1 = /^[0-9]{1,3},[0-9]{1,3},[0-9]{1,3}$/;
+    var reg2 = /^#[0-9A-Fa-f]{6}$/;
+    if (!reg1.test(color) && !reg2.test(color))
+    {
+      alert("Ingrese un color válido.");
+      return;
+    }
+    else
+    {
+      if (reg1.test(color))
+      {
+        var trio = color.split(",");
+        var n1 = parseInt(trio[0]).toString(16); n1 = n1.length == 1 ? "0"+n1 : n1;
+        var n2 = parseInt(trio[1]).toString(16); n2 = n2.length == 1 ? "0"+n2 : n2;
+        var n3 = parseInt(trio[2]).toString(16); n3 = n3.length == 1 ? "0"+n3 : n3;
+
+        color = "#" + n1 + n2 + n3;
+      }
+    }
     if (t_sectores.mapear(codigo) !== null)
     {
       alert("El código ya está en uso. ("+codigo+")");
       return;
     }
-    return [codigo, sector];
+
+    return [codigo, sector, color];
   };
 
   t_segmentos.obtenerDatos = function()
   {
-    var codigo = prompt("Codigo del segmento:");
+    var codigo = getcodigo("segmento")
     var seg = prompt("Nombre del segmento:");
     if (!seg || seg == null) return null;
     if (!codigo || codigo == null) return null;
@@ -177,6 +217,14 @@ $(function()
     {
       case "Etiqueta": return valor;
       case "Foto": return "<img src='" + valor + "' />";
+    }
+  };
+  t_sectores.formatea  = function(columna, valor)
+  {
+    switch(columna)
+    {
+      case "Color" : return "<div class=\"cuadrado\" style=\"background-color: " + valor + ";\"></div>";
+      default: return valor;
     }
   };
 

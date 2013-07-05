@@ -77,11 +77,17 @@ def ajustar(img,**kwargs):
 	w, h = img.size
 	factor = 1
 	if "alto" in kwargs:
-		factor = kwargs["alto"] / h * 1.0
-		return img.resize((int(w * factor), int(h * factor)))
+		factor = kwargs["alto"] / float(h) * 1.0
+		print factor
+		c = img.copy()
+		c.thumbnail(((int(w * factor), int(h * factor))), Image.ANTIALIAS)
+		return c
 	elif "ancho" in kwargs:
-		factor = kwargs["ancho"] / w * 1.0
-		return img.resize((int(w * factor), int(h * factor)))
+		factor = kwargs["ancho"] / float(w) * 1.0
+		print factor
+		c = img.copy()
+		c.thumbnail(((int(w * factor), int(h * factor))), Image.ANTIALIAS)
+		return c
 	else:
 		raise Exception("no argument found")
 
@@ -146,8 +152,8 @@ def agrega_entrada2(codigo, sector, tipo_foto, segmento):
 	lienzo = Image.new("RGBA", (ancho_total, alto_total), (255,255,255,255))
 
 
-	lienzo.paste(foto_codigo, (0, 24))
-	lienzo.paste(imagen_ref, (ancho_total - imagen_ref.size[0], 20))
+	lienzo.paste(foto_codigo, (0, 30))
+	lienzo.paste(imagen_ref, (ancho_total - imagen_ref.size[0], 10))
 
 	# agregar texto
 
@@ -329,8 +335,11 @@ def inicializar_variables(jsondata):
 	print fotos_entradas
 
 def vista_previa(codigo, sector, foto, segmento):
-	f = agrega_entrada2(codigo, sector, foto, segmento)
-	f.save("")
+	ofoto = Image.open(foto)
+	f = agrega_entrada2(codigo, sector, ofoto, segmento)
+	ruta = "static/previews/" + codigo + ".jpg"
+	f.save(ruta)
+	return ruta
 if __name__ == "__main__":
 	parser = OptionParser(usage="%prog [opciones] archivo_json")
 	parser.add_option("-x", "--xml", action="store_true", dest="generate_xml", default=False, help="Generar archivos XML de permisos")

@@ -6,18 +6,17 @@ import glob
 
 app = Flask(__name__)
 
-UPLOAD_FOLDER = os.path.join(os.getcwd(), "static/uploads/")
-SAVE_FOLDER = os.path.join(os.getcwd(), "static/saves/")
+UPLOAD_FOLDER = os.path.join(os.getcwd(), "static", "uploads", "")
+SAVE_FOLDER = os.path.join(os.getcwd(), "static", "saves", "")
 
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
-
 
 ALLOWED_EXTENSIONS = ["png", "jpg", "jpeg", "gif", "bmp", "webp", "tiff", "tif"]
 
 @app.route("/")
 def index():
 	def nombrearch(str):
-		return str.rsplit("/",1)[1].rsplit(".", 1)[0]
+		return str.rsplit(os.sep, 1)[1].rsplit(".", 1)[0]
 	file_list = map(nombrearch,glob.glob(os.path.join(SAVE_FOLDER, "*.json")))
 	return render_template("main.html", archivos=file_list)
 
@@ -35,7 +34,7 @@ def upload_file():
     else:
         filename = secure_filename(file.filename)
         file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-        file_url = os.path.join("/static/uploads/", filename)
+        file_url = "/static/uploads/"+filename
         return render_template("subida_exitosa.html", archivo=file_url, etiqueta=request.form["etiqueta"])
 
 @app.route("/guardaEvento", methods=['POST'])
