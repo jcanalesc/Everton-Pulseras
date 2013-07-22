@@ -13,8 +13,7 @@
 # ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE
  
-import Image
-import ImageDraw
+from PIL import Image, ImageDraw
  
 # Copied from http://en.wikipedia.org/wiki/Code_128
 # Value Weights 128A    128B    128C

@@ -5,6 +5,7 @@ from lxml import etree
 import sys
 from optparse import OptionParser
 import json
+import os
 pagina = 1
 Buf = []
 
@@ -17,60 +18,62 @@ fuentes_datos = [ImageFont.truetype("Arial_Bold.ttf", 28), ImageFont.truetype("A
 
 ancho_foto_texto = 700
 
-descripcion = "linea1 \n linea2 \n linea3"
+descripcion = u"Everton vs Wanderers\nMartes 16 de Julio\n15:30 hrs.\nEstadio Lucio Fariña"
 
-sectores = ["Preferencial", "Andes", u"Galería"]
-fotos_entradas = {}
+sectores = ["Preferencial",u"Galería"]
+fotos_entradas = {
+	(u'01','33'): "../haztesocio.jpg",
+	(u'02','33'): "../haztesocio.jpg"
+}
 color_recuadro = {
-	"Preferencial": 	(0xFF, 0xDE, 0x0A, 255),
-	"Andes":			(0xFF, 0x78, 0xF6, 255),
-	u"Galería":			(0x03, 0x0B, 0xFF, 255),
-	u"Galería Visita": 	(0, 0, 0, 255)
+	"Preferencial": 	(0xFF, 0xC5, 0x0C, 255),
+	u"Galería":			(0, 0, 0xFF, 255)
 }
 
 segmentos = {
-	"01": [u"Dirigentes",		24, 4, 30],
-	"02": [u"Jugadores y CT", 	90, 50, 20],
-	"03": [u"Go Zuko",			0, 4, 0],
-	"04": [u"Coca Cola",		4, 5, 0],
-	"05": [u"Gaucho",			2, 18, 0],
-	"06": [u"O Concept",		5, 0, 5],
-	"07": [u"Productos Fernandez",	2, 20, 0],
-	"08": [u"Clínica Reñaca",		14, 0, 0],
-	"09": [u"Clos de Pirque",		0, 10, 0],
-	"10": [u"Radio Valparaíso",		0, 5, 0],
-	"11": [u"Radio Portales",		0, 5, 0],
-	"12": [u"Radio UCV",			0, 10, 0],
-	"13": [u"Radio Festival",		8, 0, 0],
-	"14": [u"Carlos Williams",		8, 0, 0],
-	"15": [u"Radio Pasión del Cerro",	0, 0, 10],
-	"16": [u"Radio Carnaval",			0, 0, 4],
-	"17": [u"Radio Amor",				0, 2, 0],
-	"18": [u"Quintavisión",				0, 5, 0],
-	"19": [u"Administrativos",			3, 18, 2],
-	"20": [u"Municipalidad",			0, 0, 360],
-	"21": [u"Estadio Quillota",			30, 0, 10],
-	"22": [u"Concejales",				20, 0, 0],
-	"23": [u"Virginia Reginato",		10, 0, 0],
-	"24": [u"María Angélica Maldonado",	10, 0, 0],
-	"25": [u"Club Visita",				30, 0, 0],
-	"26": [u"Compromisos",				4, 20, 7],
-	"27": [u"Univ. Viña del Mar",		0, 100, 0],
-	"28": [u"Galería Everton",			0, 0, 1300],
-	"29": [u"Galería Visita",			0, 0, 500],
-	"30": [u"Preferencial",				200, 0, 0],
-	"31": [u"Andes",					0, 400, 0]
+	"33": [u"Promoción Entel", 100, 200]
+	# "01": [u"Dirigentes",		24, 4, 30],
+	# "02": [u"Jugadores y CT", 	90, 50, 20],
+	# "03": [u"Go Zuko",			0, 4, 0],
+	# "04": [u"Coca Cola",		4, 5, 0],
+	# "05": [u"Gaucho",			2, 18, 0],
+	# "06": [u"O Concept",		5, 0, 5],
+	# "07": [u"Productos Fernandez",	2, 20, 0],
+	# "08": [u"Clínica Reñaca",		14, 0, 0],
+	# "09": [u"Clos de Pirque",		0, 10, 0],
+	# "10": [u"Radio Valparaíso",		0, 5, 0],
+	# "11": [u"Radio Portales",		0, 5, 0],
+	# "12": [u"Radio UCV",			0, 10, 0],
+	# "13": [u"Radio Festival",		8, 0, 0],
+	# "14": [u"Carlos Williams",		8, 0, 0],
+	# "15": [u"Radio Pasión del Cerro",	0, 0, 10],
+	# "16": [u"Radio Carnaval",			0, 0, 4],
+	# "17": [u"Radio Amor",				0, 2, 0],
+	# "18": [u"Quintavisión",				0, 5, 0],
+	# "19": [u"Administrativos",			3, 18, 2],
+	# "20": [u"Municipalidad",			0, 0, 360],
+	# "21": [u"Estadio Quillota",			30, 0, 10],
+	# "22": [u"Concejales",				20, 0, 0],
+	# "23": [u"Virginia Reginato",		10, 0, 0],
+	# "24": [u"María Angélica Maldonado",	10, 0, 0],
+	# "25": [u"Club Visita",				30, 0, 0],
+	# "26": [u"Compromisos",				4, 20, 7],
+	# "27": [u"Univ. Viña del Mar",		0, 100, 0],
+	# "28": [u"Galería Everton",			0, 0, 1300],
+	# "29": [u"Galería Visita",			0, 0, 500],
+	# "30": [u"Preferencial",				200, 0, 0],
+	# "31": [u"Andes",					0, 400, 0]
 }
 
 # no se generan pulseras para estos
 segmentos_adicionales = {
-	"40": [u"Butaca",						2000, 0, 0],
-	"41": [u"Preferencial",					2000, 0, 0],
-	"42": [u"Andes Vip",					0, 2000, 0],
-	"43": [u"Andes Simpatizante",			0, 2000, 0],
-	"44": [u"Hincha Vip",					0, 0, 2000],
-	"45": [u"Hincha Simpatizante",			0, 0, 2000],
-	"46": [u"Simpatizante",					0, 0, 2000]
+	#"40": [u"Butaca",						2000, 0, 0],
+	#"41": [u"Preferencial",					2000, 0, 0],
+	#"42": [u"Andes Vip",					0, 2000, 0],
+	#"43": [u"Andes Simpatizante",			0, 2000, 0],
+	#"44": [u"Hincha Vip",					0, 0, 2000],
+	#"45": [u"Hincha Simpatizante",			0, 0, 2000],
+	#"46": [u"Simpatizante",					0, 0, 2000]
 }
 
 def ajustar(img,**kwargs):
@@ -100,7 +103,7 @@ def flush_buf():
 	print len(Buf)
 	for i in range(len(Buf)):
 		L.paste(Buf[i], (0, i*H))
-	dpi = 300
+	dpi = 450
 	margen_superior = 1.1
 	ancho_pag = int(dpi * (7.5))
 	alto_pag = int(dpi * 10)
@@ -176,7 +179,7 @@ def agrega_entrada2(codigo, sector, tipo_foto, segmento):
 		margen_lat = int((ancho_recuadro - fuente_chica.getsize(segmento.upper())[0]) / 2)
 		drawer.text((inicio_recuadro[0] + margen_lat, inicio_recuadro[1] + margen_sup), segmento.upper(), font=fuente_chica, fill=(255,255,255,255))
 
-		if segmento not in [u"Galería Everton", u"Galería Visita"]:
+		if segmento not in [u"Galería Everton", u"Galería Visita", u"Promoción Entel"]:
 			texto_cortesia = "Prohibida su venta".upper()
 			margen_sup = fin_recuadro[1] + 5
 			margen_lat = inicio_recuadro[0] + int((ancho_recuadro - fuente_serie.getsize(texto_cortesia)[0]) / 2)
@@ -197,7 +200,7 @@ def agrega_entrada2(codigo, sector, tipo_foto, segmento):
 		margen_sup += 30
 		margen_izq = inicio_datos[0] + int(ancho_datos - fuentes_datos[1].getsize(datos[i])[0]) / 2
 
-		drawer.text((margen_izq, margen_sup), datos[i], font=fuentes_datos[1], fill=color_recuadro[sector])	
+		drawer.text((margen_izq, margen_sup), datos[i], font=fuentes_datos[1], fill=COLOR)	
 
 
 	# numero de serie
@@ -282,7 +285,7 @@ def genera_xml_todos():
 	for i,v in enumerate(sectores):
 		fp = open("permisos_%s.xml" % v, "w+")
 		fp.write("<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n")
-		fp.write(genera_xml(v))
+		fp.write(genera_xml(v).replace(os.linesep, "\r\n"))
 		fp.close()
 
 def genera_fotos():
@@ -308,6 +311,13 @@ def hex_a_tupla(h):
 	return (r,g,b,255)
 
 def inicializar_variables(jsondata):
+	global pagina, SERIE
+	pagina = 1
+	SERIE = 1
+	import glob
+	pdfs = glob.glob(os.path.join("pdfs_prueba", "*.pdf"))
+	for arch in pdfs:
+		os.remove(arch)
 	t_registros = json.loads(jsondata["t_registros"])
 	t_sectores = json.loads(jsondata["t_sectores"])
 	for i,d in enumerate(t_sectores):
@@ -324,7 +334,7 @@ def inicializar_variables(jsondata):
 	for i,d in enumerate(t_sectores):
 		sectores.append(d["Etiqueta"])
 		color_recuadro[d["Etiqueta"]] = d["Color"]
-
+	color_recuadro[u"Galería Visita"] = (153, 51, 102, 255)
 	for i,d in enumerate(t_segmentos):
 		segmentos[d["Codigo"]] = [d["Etiqueta"]] + [0 for x in sectores]
 
@@ -332,7 +342,6 @@ def inicializar_variables(jsondata):
 		indice_sector = int(d["Sector"])
 		fotos_entradas[(d["Sector"], d["Segmento"])] = d["Foto"][1:]
 		segmentos[d["Segmento"]][indice_sector] = int(d["Entradas"])
-	print fotos_entradas
 
 def vista_previa(codigo, sector, foto, segmento):
 	ofoto = Image.open(foto)
@@ -344,13 +353,20 @@ if __name__ == "__main__":
 	parser = OptionParser(usage="%prog [opciones] archivo_json")
 	parser.add_option("-x", "--xml", action="store_true", dest="generate_xml", default=False, help="Generar archivos XML de permisos")
 	parser.add_option("-p", "--pdf", action="store_true", dest="generate_pdfs", default=False, help="Generar archivos PDF para imprimir")
+	parser.add_option("-t", "--test", action="store_true", dest="test", default=False, help=u"No leer archivo y ejecutar con parámetros por defecto")
+	parser.add_option("--serie", action="store", dest="serie_inicial", default=1, help=u"Serie inicial")
+
 	(options, args) = parser.parse_args()
 
-	if len(args) != 1:
+	if len(args) != 1 and options.test is None:
 		parser.print_help()
 		quit()
-	jdata = json.loads(open(args[0],"r").read())
-	inicializar_variables(jdata)
+	if not options.test:
+		jdata = json.loads(open(args[0],"r").read())
+		inicializar_variables(jdata)
+	else:
+		global SERIE
+		SERIE = int(options.serie_inicial)
 
 	if options.generate_xml:
 		genera_xml_todos()

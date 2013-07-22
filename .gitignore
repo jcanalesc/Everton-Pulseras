@@ -213,3 +213,11 @@ pip-log.txt
 
 #Mr Developer
 .mr.developer.cfg
+
+pdfs_prueba/
+web_everton/pdfs_prueba/
+*.xml
+web_everton/*.xml
+partidos/
+web_everton/static/saves/
+web_everton/static/uploads/

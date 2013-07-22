@@ -321,5 +321,25 @@ $(function()
   $(".new").click(function()
   {
     blanquear();
+  })
+  $("#generaentradas").click(function()
+    {
+      $.post("/generaPDF", localStorage, function(data)
+        {
+          if (data == "success")
+          {
+            alert("Entradas generadas.");
+          }
+        });
+  });
+  $("#generaxml").click(function()
+  {
+    $.post("/generaXML", localStorage, function(data)
+    {
+      if (data == "success")
+      {
+        alert("Archivos generados.");
+      }
+    });
   });
 });
