@@ -133,12 +133,11 @@ def agrega_entrada2(codigo, sector, tipo_foto, segmento):
 	foto_codigo = ajustar(foto_codigo, alto=alto_total)
 	ancho_datos = foto_codigo.size[0]/2
 	alto_recuadro = foto_codigo.size[1] + 30
-	ancho_recuadro = foto_codigo.size[0] + 50
+	ancho_recuadro = foto_codigo.size[0] + 80
 	margen_sup = 10
 
 	margen_recuadro = 24
-	alto_recuadro = foto_codigo.size[1] + 15
-	ancho_recuadro = foto_codigo.size[0] + 50
+	
 
 	inicio_recuadro = (foto_codigo.size[0] + margen_recuadro, margen_recuadro)
 	fin_recuadro = (inicio_recuadro[0] + ancho_recuadro, inicio_recuadro[1] + alto_recuadro)
@@ -334,7 +333,7 @@ def inicializar_variables(jsondata):
 	for i,d in enumerate(t_sectores):
 		sectores.append(d["Etiqueta"])
 		color_recuadro[d["Etiqueta"]] = d["Color"]
-	color_recuadro[u"Galería Visita"] = (153, 51, 102, 255)
+	color_recuadro[u"Galería Visita"] = (0x00, 0xB0, 0x6F, 255) # 00B06F
 	for i,d in enumerate(t_segmentos):
 		segmentos[d["Codigo"]] = [d["Etiqueta"]] + [0 for x in sectores]
 

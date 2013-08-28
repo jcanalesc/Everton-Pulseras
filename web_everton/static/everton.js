@@ -3,6 +3,15 @@ var t_sectores = null,
     t_fotos = null,
     t_registros = null;
 
+function numEntradas()
+{
+  var suma = 0;
+  for (var i = 0, j = t_registros.filas.length; i < j; i++)
+  {
+    suma += parseInt(t_registros.filas[i].Entradas);
+  }
+  return suma;
+}
 function getcodigo(tipo)
 {
   var arreglo = null;

@@ -7,9 +7,11 @@ import crea_imagenes
 from Tkinter import Tk
 import tkFileDialog, tkSimpleDialog, tkMessageBox
 import httplib, urllib
+import subprocess
 
 AUTH_HOST = "186.64.120.145"
 AUTH_PORT = 80
+GSPRINTPATH = 'C:\Program Files\Ghostgum\gsview\gsprint.exe'
 
 
 app = Flask(__name__)
@@ -78,7 +80,17 @@ def generar_entradas():
 	crea_imagenes.genera_fotos()
 	return "success"
 
-
+@app.route("/imprimir/<int:numpag>")
+def imprimir_pagina(numpag):
+	ruta = os.path.join("pdfs_prueba", "pagina*.pdf")
+	pags = glob.glob(ruta)
+	if numpag <= 0 or numpag > len(pags):
+		return "out-of-range"
+	p = subprocess.Popen([GSPRINTPATH, "-color", os.path.join(os.getcwd(), os.path.join("pdfs_prueba", "pagina%d.pdf" % numpag))], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+	stdout, stderr = p.communicate()
+	print stdout
+	print stderr
+	return "success"
 
 if __name__ == "__main__":
 	# try:
