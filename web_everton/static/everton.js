@@ -138,6 +138,16 @@ function cargar(evento)
     });
   });
 }
+function actualizar_conteo(object)
+{
+  var total = 0;
+  for (var i = 0; i < object.filas.length; i++)
+  {
+    total += parseInt(object.filas[i]["Entradas"]);
+  }
+  console.log(total);
+  $("#totalentradas").html(total);
+}
 $(function()
 {
   t_sectores = new Tabla("#sectores",["Codigo", "Etiqueta", "Color"], "sector", true);
@@ -303,10 +313,12 @@ $(function()
       return;
     }
     t_registros.agregaFila([sec,seg,ent,fot]);
+    actualizar_conteo(t_registros);
   });
   
   
   cargar_desde_localstorage();
+  actualizar_conteo(t_registros);
 
   localStorage["descripcion"] = $("#descripcion").val();
 

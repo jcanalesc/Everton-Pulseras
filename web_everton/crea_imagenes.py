@@ -81,13 +81,13 @@ def ajustar(img,**kwargs):
 	factor = 1
 	if "alto" in kwargs:
 		factor = kwargs["alto"] / float(h) * 1.0
-		print factor
+		#print factor
 		c = img.copy()
 		c.thumbnail(((int(w * factor), int(h * factor))), Image.ANTIALIAS)
 		return c
 	elif "ancho" in kwargs:
 		factor = kwargs["ancho"] / float(w) * 1.0
-		print factor
+		#print factor
 		c = img.copy()
 		c.thumbnail(((int(w * factor), int(h * factor))), Image.ANTIALIAS)
 		return c
@@ -100,26 +100,28 @@ def flush_buf():
 	global Buf, pagina
 	W, H = Buf[0].size
 	L = Image.new("RGBA", (W, H*10), (255,255,255,255))
-	print len(Buf)
+	#print len(Buf)
 	for i in range(len(Buf)):
 		L.paste(Buf[i], (0, i*H))
 	dpi = 450
 	margen_superior = 1.1
+
+	marg_izq = 0.1
 	ancho_pag = int(dpi * (7.5))
 	alto_pag = int(dpi * 10)
 	Doc = Image.new("RGB", (ancho_pag, alto_pag), (255,255,255))
 	L = L.rotate(-90,expand=True)
 	lw, lh = L.size
-	escala = ancho_pag*1.0 / lw
+	escala = (ancho_pag - marg_izq*dpi)*1.0 / lw
 	L = L.resize((int(lw*escala), int(lh*escala)))
-	Doc.paste(L, (0, int(margen_superior*dpi), L.size[0], int(margen_superior*dpi) + L.size[1]))
+	Doc.paste(L, (int(marg_izq*dpi), int(margen_superior*dpi)))
 	Doc.save("pdfs_prueba/pagina%d.pdf" % pagina, "PDF", resolution=dpi)
 	pagina = pagina +1
 	Buf = []
 
 def agrega_entrada2(codigo, sector, tipo_foto, segmento):
 	imagen_ref = ajustar(tipo_foto, alto=160)
-	print imagen_ref
+	#print imagen_ref
 	"""
 	if segmento not in sectores and segmento not in [u"Galería Everton", u"Galería Visita"]:
 		imagen_ref = cort[tipo_foto]
@@ -142,7 +144,7 @@ def agrega_entrada2(codigo, sector, tipo_foto, segmento):
 	inicio_recuadro = (foto_codigo.size[0] + margen_recuadro, margen_recuadro)
 	fin_recuadro = (inicio_recuadro[0] + ancho_recuadro, inicio_recuadro[1] + alto_recuadro)
 
-	ancho_datos = 350
+	ancho_datos = 380
 	alto_datos = foto_codigo.size[1] + 30
 
 	inicio_datos = (fin_recuadro[0] + 5, inicio_recuadro[1])
@@ -173,7 +175,7 @@ def agrega_entrada2(codigo, sector, tipo_foto, segmento):
 
 	drawer.text((inicio_recuadro[0] +  margen_lat, inicio_recuadro[1] + margen_sup), sector.upper(), font=fuente)
 
-	if segmento not in sectores:
+	if segmento not in sectores or segmento == u"Galería Visita":
 		margen_sup = margen_sup + 50
 		margen_lat = int((ancho_recuadro - fuente_chica.getsize(segmento.upper())[0]) / 2)
 		drawer.text((inicio_recuadro[0] + margen_lat, inicio_recuadro[1] + margen_sup), segmento.upper(), font=fuente_chica, fill=(255,255,255,255))
@@ -297,8 +299,13 @@ def genera_fotos():
 			for n in range(props[i+1]):
 				codigo_completo = "%04d%s%02d" % (n+1, cod_seg, i+1)
 				Buf.append(agrega_entrada2(codigo_completo, v, foto_evento, props[0]))
+				sys.stdout.write(".")
 				if len(Buf) == 10:
 					flush_buf()
+				global SERIE
+				if SERIE % 100 == 0:
+					sys.stdout.write("\n")
+				sys.stdout.flush()
 	if len(Buf) > 0:
 		flush_buf()
 
@@ -321,7 +328,7 @@ def inicializar_variables(jsondata):
 	t_sectores = json.loads(jsondata["t_sectores"])
 	for i,d in enumerate(t_sectores):
 		t_sectores[i]["Color"] = hex_a_tupla(d["Color"])
-		print t_sectores[i]["Color"]
+		#print t_sectores[i]["Color"]
 	t_segmentos = json.loads(jsondata["t_segmentos"])
 	global segmentos, sectores, color_recuadro, fotos_entradas, descripcion
 	descripcion = jsondata["descripcion"]
@@ -333,7 +340,7 @@ def inicializar_variables(jsondata):
 	for i,d in enumerate(t_sectores):
 		sectores.append(d["Etiqueta"])
 		color_recuadro[d["Etiqueta"]] = d["Color"]
-	color_recuadro[u"Galería Visita"] = (0x00, 0xB0, 0x6F, 255) # 00B06F
+	#color_recuadro[u"Galería Visita"] = (0x00, 0xB0, 0x6F, 255) # 00B06F
 	for i,d in enumerate(t_segmentos):
 		segmentos[d["Codigo"]] = [d["Etiqueta"]] + [0 for x in sectores]
 
